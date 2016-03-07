@@ -15,7 +15,7 @@ setup(
     license='BSD License',  # example license
     description='More generic form of django prefetch_related',
     long_description=README,
-    url='https://github.com/jdroloson',
+    url='https://github.com/jdroloson/django-prefetch-plus',
     
     author='Jordan Rolson',
     author_email='jdroloson@gmail.com',
