@@ -1,0 +1,1 @@
+from prefetch_plus.prefetch_plus import PrefetchPlusQuerySet, do_prefetch_plus
