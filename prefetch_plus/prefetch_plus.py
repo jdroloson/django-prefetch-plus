@@ -24,7 +24,10 @@ def do_prefetch_plus(objects, to_attr, query_set, obj_cols, qset_cols):
                     new_obj = getattr(new_obj, level)
                 values_list.append(getattr(new_obj, levels[-1]))
             except AttributeError:
-                continue
+                if new_obj is None:
+                    continue
+                else:
+                    raise
         kwargs[rhs + '__in'] = values_list
     new_query_set = query_set.filter(**kwargs)
 
@@ -39,14 +42,22 @@ def do_prefetch_plus(objects, to_attr, query_set, obj_cols, qset_cols):
         items[tuple(vals)].append(item)
 
     for obj in objects:
-        vals = []
-        for col in obj_cols:
-            levels = col.split(LOOKUP_SEP)
-            new_obj = obj
-            for level in levels[:-1]:
-                new_obj = getattr(new_obj, level)
-            vals.append(getattr(new_obj, levels[-1]))
-        setattr(obj, to_attr, items[tuple(vals)])
+        set_val = []
+        try:
+            vals = []
+            for col in obj_cols:
+                levels = col.split(LOOKUP_SEP)
+                new_obj = obj
+                for level in levels[:-1]:
+                    new_obj = getattr(new_obj, level)
+                vals.append(getattr(new_obj, levels[-1]))
+            set_val = items[tuple(vals)]
+        except AttributeError:
+            if new_obj is None:
+                continue
+            else:
+                raise
+        setattr(obj, to_attr, set_val)
 
 
 class PrefetchPlus(object):
