@@ -1,2 +1,4 @@
 dist/
 *.egg-info
+build/
+prefetch_plus/__pycache__/
