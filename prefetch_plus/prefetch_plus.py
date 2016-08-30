@@ -54,7 +54,7 @@ def do_prefetch_plus(objects, to_attr, query_set, obj_cols, qset_cols):
             set_val = items[tuple(vals)]
         except AttributeError:
             if new_obj is None:
-                continue
+                pass
             else:
                 raise
         setattr(obj, to_attr, set_val)
