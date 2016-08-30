@@ -132,3 +132,7 @@ do_prefetch_plus(
 )
 ```
 
+Version History
+-----------
+0.2: Made Prefetch plus faster at the cost of potentially grabbing extra
+     records in the case of composite keys. Fixed support for 2.7

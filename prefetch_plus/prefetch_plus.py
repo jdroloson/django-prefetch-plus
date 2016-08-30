@@ -1,5 +1,4 @@
-from _collections import defaultdict
-from _collections_abc import Iterable
+from collections import defaultdict, Iterable
 
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query import QuerySet
@@ -14,18 +13,20 @@ def do_prefetch_plus(objects, to_attr, query_set, obj_cols, qset_cols):
     if not isinstance(qset_cols, Iterable) or isinstance(qset_cols, str):
         qset_cols = (qset_cols,)
 
-    sieve = Q()
-    for obj in objects:
-        inner_sieve = Q()
-        for lhs, rhs in zip(obj_cols, qset_cols):
+    kwargs = {}
+    for lhs, rhs in zip(obj_cols, qset_cols):
+        values_list = []
+        for obj in objects:
             levels = lhs.split(LOOKUP_SEP)
-            new_obj = obj
-            for level in levels[:-1]:
-                new_obj = getattr(new_obj, level)
-            kwargs = {rhs: getattr(new_obj, levels[-1])}
-            inner_sieve &= Q(**kwargs)
-        sieve |= inner_sieve
-    new_query_set = query_set.filter(sieve)
+            try:
+                new_obj = obj
+                for level in levels[:-1]:
+                    new_obj = getattr(new_obj, level)
+                values_list.append(getattr(new_obj, levels[-1]))
+            except AttributeError:
+                continue
+        kwargs[rhs + '__in'] = values_list
+    new_query_set = query_set.filter(**kwargs)
 
     for item in new_query_set:
         vals = []
